@@ -25,16 +25,42 @@ def generate_card(): #function for generating cards
     return card(card_index % 13 + 1, suite, value)
 
 
-def add_card(card):
-    if card not in cardCache:  
-        cardCache.add(card)  # directly modifies the global set
+def add_unique_card():
+    new_card = generate_card()
+    while new_card in cardCache:  # Regenerate if duplicate
+        new_card = generate_card()
+    cardCache.add(new_card)
+    return new_card
+
+#The river mechanics
+def generate_river(iter, river=[]):
+    if iter == 0:
+        river = []
+        r1 = add_unique_card()
+        r2 = add_unique_card()
+        r3 = add_unique_card()
+        river.append(r1)
+        river.append(r2)
+        river.append(r3)
+    if iter == 1:
+        r4 = add_unique_card()
+        river.append(r4)
+
+    if iter == 2:
+        r5 = add_unique_card()
+        river.append(r5)
+    return river
+
     
 
-
-c1 = generate_card()
-add_card(c1) # add the first card
-c2 = generate_card()
-add_card(c2)#Keep regenrating until c2 is unique
+def print_river(river):
+    print("====================================")
+    print("The river:")
+    for i in range(len(river)):
+        print(f'\nCard {i+1}: {river[i].face} of {river[i].suite}')
+    print("====================================")
+c1 = add_unique_card() # add the first card
+c2 = add_unique_card()#Keep regenrating until c2 is unique
 
 #simple UI
 print("====================================")
@@ -43,9 +69,35 @@ print(f"Card 1: {c1.face} of {c1.suite}")
 print(f"Card 1: {c2.face} of {c2.suite}")
 print("====================================")
 
+river = generate_river(0)
+print_river(river)
+
+iter = 1
+user = input("Push or fold? ")
+
+while user.lower() == "push" and iter <= 2:
+    generate_river(iter, river)
+    print_river(river)
+    iter += 1
+    user = input("Push or fold? ")
+
+else:
+    if len(river) <5: print("\nYou folded! Here is the full river")
+    if len(river) == 3:
+        generate_river(1, river)
+        generate_river(2, river)
+        print_river(river)
+
+    if len(river) == 4:
+        generate_river(2, river)
+        print_river(river)
+    
+    
 
 
- 
+
+    
+
 
 
 
