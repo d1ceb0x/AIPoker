@@ -31,6 +31,48 @@ def add_unique_card():
         new_card = generate_card()
     cardCache.add(new_card)
     return new_card
+def is_pair(cards):
+    """returns the value of the pair if found, else None"""
+    count = {}
+    for card in cards:
+        count[card.value] = count.get(card.value, 0) + 1
+    for value, freq in count.items():
+        if freq == 2:
+            return ([value] * 2, count)
+    return (None, count)
+
+def is_three(cards):
+    """returns the value of the three of a kind if found, else None"""
+    count = {}
+    for card in cards:
+        count[card.value] = count.get(card.value, 0) + 1
+    for value, freq in count.items():
+        if freq == 3:
+            return ([value] * 3, count)
+    return (None, count)
+
+def is_four(cards):
+    """returns the value of the four of a kind if found, else None"""
+    count = {}
+    for card in cards:
+        count[card.value] = count.get(card.value, 0) + 1
+    for value, freq in count.items():
+        if freq == 4:
+            return [value] * 4
+    return (None, count)
+def rank_hand(c1, c2, river):
+    slots = sorted([c1, c2] + river, key=lambda x: x.value)
+    full_house_check = set(([i for i in is_pair(slots)[1].keys() if is_pair(slots)[1][i]==2])).union(set(([j for j in is_three(slots)[1].keys() if is_three(slots)[1][j] == 3])))
+    if (len(full_house_check) == 2):
+        return "full house", full_house_check
+    elif (res := is_four(slots)[0]):
+        return "four of a kind", res
+    elif (res := is_three(slots)[0]):
+        return "three of a kind", res
+    elif (res := is_pair(slots)[0]):
+        return "pair", res
+    return "nothing", []
+
 
 #The river mechanics
 def generate_river(iter, river=[]):
@@ -92,8 +134,17 @@ else:
         generate_river(2, river)
         print_river(river)
     
-    
+c1 = card(13, "hearts", "King")
+c2 = card(13, "spades", "King")
 
+river = [
+    card(13, "diamonds", "King"),  # Third King (Three of a Kind)
+    card(1, "clubs", "Ace"),       # First Ace (Pair)
+    card(1, "spades", "Ace")       # Second Ace (Completes Full House)
+]
+   
+rank, res = rank_hand(c1, c2, river)
+print(f'You had a {rank} which was {res}')
 
 
     
